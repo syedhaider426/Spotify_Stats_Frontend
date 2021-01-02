@@ -1,6 +1,7 @@
 import React from "react";
 import { Vega } from "react-vega";
 import Filter from "./Filter";
+import Year from "./Year";
 
 // chart config
 const jobpalBlue = "#e0e0e0";
@@ -61,11 +62,14 @@ class App extends React.Component {
     height: 300,
     graphData: [],
     completeData: [],
-    selectedField: "acousticness",
+    selectedField: "danceability",
     artist: "",
     min: 0,
     max: 0,
     artistData: [],
+    year: 0,
+    startYear: 0,
+    endYear: 0,
   };
 
   componentDidMount() {
@@ -98,6 +102,7 @@ class App extends React.Component {
         url: d.link,
       }));
       let { min, max } = yAxisMin_MaxValueFor(a, this.state.selectedField);
+
       this.setState({ graphData: a, min, max });
     }
   }
@@ -184,7 +189,6 @@ class App extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
-    console.log(this.state.artist);
     if (this.state.artist !== "") {
       fetch(`http://localhost:8080/info?artist=${this.state.artist}`)
         .then((response) => response.json())
@@ -197,14 +201,87 @@ class App extends React.Component {
             url: d.link,
           }));
           let { min, max } = yAxisMin_MaxValueFor(a, field);
+          const startYear = parseInt(this.getYear(d[0].releaseDate));
+          const endYear = parseInt(this.getYear(d[d.length - 1].releaseDate));
           this.setState({
             completeData: d,
             graphData: a,
+            year: startYear,
+            startYear,
+            endYear,
             min,
             max,
           });
         });
     }
+  };
+
+  getYear = (year) => {
+    return convertDate(year).substring(0, 4);
+  };
+
+  handleChangeStartYear = ({ target }) => {
+    //2016-2020
+    //value is 2017
+    // check if value is less than/equal to end year
+    console.log("Was this called again", target.value);
+    let data;
+    // this.setState({ startYear: target.value });
+    data = this.filterByYear("start", target.value);
+    const a = data.map((d) => ({
+      date: convertDate(d.releaseDate),
+      [this.state.selectedField]: d[this.state.selectedField],
+      song: d.song,
+      url: d.link,
+    }));
+    let { min, max } = yAxisMin_MaxValueFor(a, this.state.selectedField);
+    this.setState({
+      graphData: a,
+      startYear: target.value,
+      min,
+      max,
+    });
+  };
+
+  handleChangeEndYear = ({ target }) => {
+    //2016-2020
+    //value is 2017
+    // check if value is less than/equal to end year
+    let data;
+    this.setState({ endYear: target.value });
+    data = this.filterByYear("end", target.value);
+    const a = data.map((d) => ({
+      date: convertDate(d.releaseDate),
+      [this.state.selectedField]: d[this.state.selectedField],
+      song: d.song,
+      url: d.link,
+    }));
+    let { min, max } = yAxisMin_MaxValueFor(a, this.state.selectedField);
+    this.setState({
+      graphData: a,
+      endYear: target.value,
+      min,
+      max,
+    });
+  };
+
+  filterByYear = (type, year) => {
+    const { completeData, startYear, endYear } = { ...this.state };
+    const d = completeData.reduce(function (filtered, option) {
+      const releaseDate = convertDate(option.releaseDate).substring(0, 4);
+      console.log("releaseDate", releaseDate);
+      if (type === "start" && year <= releaseDate && releaseDate <= endYear) {
+        filtered.push(option);
+      } else if (
+        type === "end" &&
+        startYear <= releaseDate &&
+        releaseDate <= year
+      ) {
+        filtered.push(option);
+      }
+      return filtered;
+    }, []);
+    return d;
   };
 
   render() {
@@ -245,6 +322,13 @@ class App extends React.Component {
           artist={this.state.artist}
           artistData={this.state.artistData}
         ></Filter>
+        <Year
+          year={this.state.year}
+          handleChangeStartYear={this.handleChangeStartYear}
+          handleChangeEndYear={this.handleChangeEndYear}
+          startYear={this.state.startYear}
+          endYear={this.state.endYear}
+        />
         <Vega
           spec={{
             ...spec,
