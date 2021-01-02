@@ -16,7 +16,7 @@ const areaMark = {
     size: "25",
   },
 
-  interpolate: "monotone",
+  interpolate: "catmull-rom",
 };
 
 const getDateXObj = (rangeLen) => ({
@@ -41,7 +41,7 @@ const yAxisMin_MaxValueFor = (data, key) => {
     if (tmp > highest) highest = tmp;
   }
   return {
-    max: Math.ceil(highest),
+    max: highest < 0.9 ? highest + 0.1 : highest,
     min: Math.floor((lowest + Number.EPSILON) * 10) / 10,
   };
 };
@@ -53,6 +53,8 @@ function convertDate(releaseDate) {
   return data;
 }
 
+var random = Math.floor(Math.random() * 230);
+
 class App extends React.Component {
   state = {
     width: 400,
@@ -60,8 +62,10 @@ class App extends React.Component {
     graphData: [],
     completeData: [],
     selectedField: "acousticness",
+    artist: "",
     min: 0,
     max: 0,
+    artistData: [],
   };
 
   componentDidMount() {
@@ -69,18 +73,11 @@ class App extends React.Component {
       passive: true,
       capture: false,
     });
-    fetch("http://localhost:8080/info?artist=Excision")
+
+    fetch("http://localhost:8080/allArtists")
       .then((response) => response.json())
       .then((d) => {
-        const field = this.state.selectedField;
-        const a = d.map((d) => ({
-          date: convertDate(d.releaseDate),
-          [field]: d.acousticness,
-          song: d.song,
-          url: d.link,
-        }));
-        let { min, max } = yAxisMin_MaxValueFor(a, this.state.selectedField);
-        this.setState({ completeData: d, graphData: a, min, max });
+        this.setState({ artistData: d });
       });
   }
 
@@ -166,7 +163,7 @@ class App extends React.Component {
             {
               field: this.state.selectedField,
               type: "quantitative",
-              title: "Energy",
+              title: "Value",
             },
             { field: "song", title: "Song" },
             { field: "date", title: "Date", timeUnit: "yearmonthdate" },
@@ -181,13 +178,57 @@ class App extends React.Component {
       this.setState({ selectedField: target.value });
   };
 
+  handleArtistChange = (e, value) => {
+    this.setState({ artist: value });
+  };
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(this.state.artist);
+    if (this.state.artist !== "") {
+      fetch(`http://localhost:8080/info?artist=${this.state.artist}`)
+        .then((response) => response.json())
+        .then((d) => {
+          const field = this.state.selectedField;
+          const a = d.map((d) => ({
+            date: convertDate(d.releaseDate),
+            [field]: d[field],
+            song: d.song,
+            url: d.link,
+          }));
+          let { min, max } = yAxisMin_MaxValueFor(a, field);
+          this.setState({
+            completeData: d,
+            graphData: a,
+            min,
+            max,
+          });
+        });
+    }
+  };
+
   render() {
     const {
       state: { width, height, graphData },
       getSpec,
     } = this;
 
-    if (graphData.length == 0) return <h1>test</h1>;
+    if (graphData.length == 0)
+      return (
+        <div
+          ref={this.refChartWrapper}
+          style={{ margin: "10vh 10vw", width: "80vw", height: "50vh" }}
+        >
+          <Filter
+            attribute={this.state.selectedField}
+            handleChange={this.handleChange}
+            handleSubmit={this.handleSubmit}
+            handleArtistChange={this.handleArtistChange}
+            artist={this.state.artist}
+            artistData={this.state.artistData}
+          ></Filter>
+        </div>
+      );
 
     const arr = this.setYAxis();
     const spec = getSpec(arr, graphData.length);
@@ -199,9 +240,11 @@ class App extends React.Component {
         <Filter
           attribute={this.state.selectedField}
           handleChange={this.handleChange}
-        >
-          {" "}
-        </Filter>
+          handleSubmit={this.handleSubmit}
+          handleArtistChange={this.handleArtistChange}
+          artist={this.state.artist}
+          artistData={this.state.artistData}
+        ></Filter>
         <Vega
           spec={{
             ...spec,
