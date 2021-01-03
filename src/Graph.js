@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@material-ui/core";
 import React, { Component } from "react";
+import { Fragment } from "react";
 import { Vega } from "react-vega";
 import Filter from "./components/Filter";
 import Year from "./components/Year";
@@ -204,17 +205,19 @@ export default class Graph extends Component {
   };
 
   // Function called when user enters a valid artist name
-  handleArtistChange = (e, value) => {
-    if (value.length > 0) this.setState({ artist: value });
+  handleArtistChange = (e, v) => {
+    this.setState({ artist: v });
+    this.handleSubmit(e, v);
   };
 
   // When the form is submitted, get data for artist entered
-  handleSubmit = (e) => {
+  handleSubmit = (e, artist) => {
     e.preventDefault();
-    if (this.state.artist !== "") {
-      fetch(`http://localhost:8080/info?artist=${this.state.artist}`)
+    if (artist !== "") {
+      fetch(`http://localhost:8080/info?artist=${artist}`)
         .then((response) => response.json())
         .then((data) => {
+          if (data === null || data.length === 0) return;
           const field = this.state.selectedField;
           const newData = data.map((d) => ({
             date: convertDate(d.releaseDate),
@@ -327,8 +330,12 @@ export default class Graph extends Component {
     if (graphData.length === 0)
       return (
         <div
-          ref={this.refChartWrapper}
-          style={{ margin: "10vh 10vw", width: "80vw", height: "50vh" }}
+          style={{
+            width: "50%",
+            marginTop: "2%",
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
         >
           <Card>
             <CardContent>{filter}</CardContent>
@@ -340,41 +347,52 @@ export default class Graph extends Component {
     const spec = getSpec(yAxis, graphData.length);
 
     return (
-      <div
-        ref={this.refChartWrapper}
-        style={{ margin: "10vh 10vw", width: "80vw", height: "50vh" }}
-      >
-        <Card>
-          <CardContent>
-            {filter}
-            <Year
-              year={year}
-              handleChangeStartYear={handleChangeStartYear}
-              handleChangeEndYear={handleChangeEndYear}
-              startYear={startYear}
-              endYear={endYear}
-            />
-          </CardContent>
-        </Card>
-
-        <Vega
-          spec={{
-            ...spec,
-            autosize: "fit",
-            resize: true,
-            contains: "padding",
-            width,
-            padding: {
-              left: 20.6,
-              right: 20.6,
-            },
-            height,
-            data: { values: graphData },
+      <Fragment>
+        <div
+          style={{
+            width: "45%",
+            minWidth: "400px",
+            marginTop: "2%",
+            marginLeft: "auto",
+            marginRight: "auto",
           }}
-          actions={false}
-          downloadFileName={"Just Name It"}
-        />
-      </div>
+        >
+          <Card>
+            <CardContent>
+              {filter}
+              <Year
+                year={year}
+                handleChangeStartYear={handleChangeStartYear}
+                handleChangeEndYear={handleChangeEndYear}
+                startYear={startYear}
+                endYear={endYear}
+              />
+            </CardContent>
+          </Card>
+        </div>
+        <div
+          ref={this.refChartWrapper}
+          style={{ margin: "0vh 10vw", width: "80vw", height: "60vh" }}
+        >
+          <Vega
+            spec={{
+              ...spec,
+              autosize: "fit",
+              resize: true,
+              contains: "padding",
+              width,
+              padding: {
+                left: 20.6,
+                right: 20.6,
+              },
+              height,
+              data: { values: graphData },
+            }}
+            actions={false}
+            downloadFileName={"Just Name It"}
+          />
+        </div>
+      </Fragment>
     );
   }
 }

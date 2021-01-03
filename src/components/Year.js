@@ -6,7 +6,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import React from "react";
-import { Fragment } from "react";
 
 // Styling for the form control
 const useStyles = makeStyles((theme) => ({

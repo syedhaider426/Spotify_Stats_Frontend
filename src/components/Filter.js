@@ -10,7 +10,7 @@ import TextField from "@material-ui/core/TextField";
 import Select from "@material-ui/core/Select";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
-import { FormHelperText, Link } from "@material-ui/core";
+import { FormHelperText } from "@material-ui/core";
 // Styling for the form control
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -79,7 +79,7 @@ export default function Filter({
               label="Enter Artist..."
               onKeyDown={(e) => {
                 if (e.key === "Enter" && e.target.value) {
-                  handleSubmit(e);
+                  handleSubmit(e, e.target.value);
                 }
               }}
             />
