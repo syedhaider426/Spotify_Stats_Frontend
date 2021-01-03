@@ -1,19 +1,8 @@
+import { Card, CardContent } from "@material-ui/core";
 import React, { Component } from "react";
 import { Vega } from "react-vega";
 import Filter from "./components/Filter";
 import Year from "./components/Year";
-
-// Specific graph will be a line chart
-const areaMark = {
-  type: "line",
-  point: {
-    filled: false,
-    fill: "white",
-    stroke: "26",
-    size: "25",
-  },
-  interpolate: "linear",
-};
 
 // Specifies the type of data in the x-axis
 const getDateXObj = (rangeLen) => ({
@@ -63,7 +52,7 @@ function getYear(date) {
   return convertDate(date).substring(0, 4);
 }
 
-export default class App extends Component {
+export default class Graph extends Component {
   state = {
     width: 400,
     height: 300,
@@ -175,27 +164,37 @@ export default class App extends Component {
   });
 
   // Set spec for vega to process
-  getSpec = (yAxisValues = [], rangeLen = 0) => ({
-    title: "All-Time Stats",
-    $schema: "https://vega.github.io/schema/vega-lite/v4.json",
-    mark: {
-      ...areaMark,
-    },
-    encoding: {
-      x: getDateXObj(rangeLen),
-      y: this.getQuantitativeYObj(this.state.selectedField, "", yAxisValues),
-      href: { field: "url" },
-      tooltip: [
-        {
-          field: this.state.selectedField,
-          type: "quantitative",
-          title: "Value",
+  getSpec = (yAxisValues = [], rangeLen = 0) => {
+    const { startYear, endYear, selectedField } = { ...this.state };
+    const title = startYear + " - " + endYear + ": " + selectedField;
+    return {
+      title,
+      $schema: "https://vega.github.io/schema/vega-lite/v4.json",
+      mark: {
+        type: "line",
+        point: {
+          filled: false,
+          fill: "white",
+          stroke: "26",
+          size: "25",
         },
-        { field: "song", title: "Song" },
-        { field: "date", title: "Date", timeUnit: "yearmonthdate" },
-      ],
-    },
-  });
+      },
+      encoding: {
+        x: getDateXObj(rangeLen),
+        y: this.getQuantitativeYObj(this.state.selectedField, "", yAxisValues),
+        href: { field: "url" },
+        tooltip: [
+          {
+            field: this.state.selectedField,
+            type: "quantitative",
+            title: "Value",
+          },
+          { field: "song", title: "Song" },
+          { field: "date", title: "Date", timeUnit: "yearmonthdate" },
+        ],
+      },
+    };
+  };
 
   // Function called when user changes attribute in 'Attribute' dropdown'
   handleAttributeChange = ({ target }) => {
@@ -331,26 +330,33 @@ export default class App extends Component {
           ref={this.refChartWrapper}
           style={{ margin: "10vh 10vw", width: "80vw", height: "50vh" }}
         >
-          {filter}
+          <Card>
+            <CardContent>{filter}</CardContent>
+          </Card>
         </div>
       );
 
     const yAxis = setYAxis();
-
     const spec = getSpec(yAxis, graphData.length);
+
     return (
       <div
         ref={this.refChartWrapper}
         style={{ margin: "10vh 10vw", width: "80vw", height: "50vh" }}
       >
-        {filter}
-        <Year
-          year={year}
-          handleChangeStartYear={handleChangeStartYear}
-          handleChangeEndYear={handleChangeEndYear}
-          startYear={startYear}
-          endYear={endYear}
-        />
+        <Card>
+          <CardContent>
+            {filter}
+            <Year
+              year={year}
+              handleChangeStartYear={handleChangeStartYear}
+              handleChangeEndYear={handleChangeEndYear}
+              startYear={startYear}
+              endYear={endYear}
+            />
+          </CardContent>
+        </Card>
+
         <Vega
           spec={{
             ...spec,
@@ -358,6 +364,10 @@ export default class App extends Component {
             resize: true,
             contains: "padding",
             width,
+            padding: {
+              left: 20.6,
+              right: 20.6,
+            },
             height,
             data: { values: graphData },
           }}

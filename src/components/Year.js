@@ -1,3 +1,4 @@
+import { Grid } from "@material-ui/core";
 import Container from "@material-ui/core/Container";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -5,12 +6,23 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import React from "react";
+import { Fragment } from "react";
 
 // Styling for the form control
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
+  },
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+    height: 140,
+    width: 100,
+  },
+  control: {
+    padding: theme.spacing(2),
   },
 }));
 
@@ -37,26 +49,28 @@ export default function Year({
   const classes = useStyles();
   return (
     <Container maxWidth="xs">
-      <FormControl className={classes.formControl}>
-        <InputLabel>Start Year</InputLabel>
-        <Select onChange={handleChangeStartYear} value={startYear}>
-          {yearList.map((year) => (
-            <MenuItem value={year} disabled={year > endYear}>
-              {year}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl className={classes.formControl}>
-        <InputLabel>End Year</InputLabel>
-        <Select onChange={handleChangeEndYear} value={endYear}>
-          {yearList.map((year) => (
-            <MenuItem value={year} disabled={year < startYear}>
-              {year}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <Grid container>
+        <FormControl className={classes.formControl}>
+          <InputLabel>Start Year</InputLabel>
+          <Select onChange={handleChangeStartYear} value={startYear}>
+            {yearList.map((year) => (
+              <MenuItem value={year} disabled={year > endYear}>
+                {year}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl className={classes.formControl}>
+          <InputLabel>End Year</InputLabel>
+          <Select onChange={handleChangeEndYear} value={endYear}>
+            {yearList.map((year) => (
+              <MenuItem value={year} disabled={year < startYear}>
+                {year}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
     </Container>
   );
 }
