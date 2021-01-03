@@ -11,6 +11,7 @@ import Select from "@material-ui/core/Select";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
 import { FormHelperText } from "@material-ui/core";
+import { Link } from "react-router-dom";
 // Styling for the form control
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -30,15 +31,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const spotifyStats = {
-  acousticness: "Represents whether the track is acoustic",
-  danceability: "Represents whether the track is suitable for dancing",
-  energy: "Represents a perceptual measure of intensity and activity.",
-  instrumentalness: "Represents whether a track contains no vocals",
-  liveness: "Represents the presence of an audience in the recording",
-  loudness: "Represents the overall loudness of a track in decibels",
-  speechiness: "Represents the presence of spoken words in a track",
-  valence: "Represents the musical positiveness conveyed by a track",
-  tempo: "Estimated temp of track in BPM",
+  acousticness: "track is acoustic",
+  danceability: "suitable for dancing",
+  energy: "perceptual measure of intensity and activity.",
+  instrumentalness: "track contains no vocals",
+  liveness: "presence of an audience in the recording",
+  loudness: "overall loudness of a track in decibels",
+  speechiness: "presence of spoken words in a track",
+  valence: "musical positiveness conveyed by a track",
+  tempo: "estimated tempo of track in BPM",
 };
 
 const SpotifyTypography = withStyles({
@@ -77,6 +78,11 @@ export default function Filter({
               {...params}
               variant="outlined"
               label="Enter Artist..."
+              helperText={
+                <Typography variant="caption">
+                  <Link to="/artist">Add an artist!</Link>
+                </Typography>
+              }
               onKeyDown={(e) => {
                 if (e.key === "Enter" && e.target.value) {
                   handleSubmit(e, e.target.value);
