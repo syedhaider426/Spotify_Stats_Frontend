@@ -78,11 +78,12 @@ export default class Graph extends Component {
       passive: true,
       capture: false,
     });
-    fetch("http://localhost:8080/allArtists")
+    fetch("/allArtists")
       .then((response) => response.json())
       .then((artistData) => {
         this.setState({ artistData });
-      });
+      })
+      .catch((ex) => console.log(ex));
   }
 
   /* Resize the graph properly */
@@ -213,30 +214,35 @@ export default class Graph extends Component {
   // When the form is submitted, get data for artist entered
   handleSubmit = (e, artist) => {
     e.preventDefault();
-    if (artist !== "") {
-      fetch(`http://localhost:8080/info?artist=${artist}`)
-        .then((response) => response.json())
-        .then((data) => {
-          if (data === null || data.length === 0) return;
-          const field = this.state.selectedField;
-          const newData = data.map((d) => ({
-            date: convertDate(d.releaseDate),
-            [field]: d[field],
-            song: d.song,
-            url: d.link,
-          }));
-          let { min, max } = yAxisMin_MaxValueFor(newData, field);
-          this.setState({
-            completeData: data,
-            graphData: newData,
-            year: parseInt(getYear(data[0].releaseDate)),
-            startYear: parseInt(getYear(data[0].releaseDate)),
-            endYear: parseInt(getYear(data[data.length - 1].releaseDate)),
-            min,
-            max,
-          });
-        });
-    }
+    if (artist != null)
+      if (artist.length !== 0) {
+        fetch(`/info?artist=${artist}`)
+          .then((response) => {
+            if (response.ok) return response.json();
+            throw new Error("Server was unable to respond.");
+          })
+          .then((data) => {
+            if (data === null || data.length === 0) return;
+            const field = this.state.selectedField;
+            const newData = data.map((d) => ({
+              date: convertDate(d.releaseDate),
+              [field]: d[field],
+              song: d.song,
+              url: d.link,
+            }));
+            let { min, max } = yAxisMin_MaxValueFor(newData, field);
+            this.setState({
+              completeData: data,
+              graphData: newData,
+              year: parseInt(getYear(data[0].releaseDate)),
+              startYear: parseInt(getYear(data[0].releaseDate)),
+              endYear: parseInt(getYear(data[data.length - 1].releaseDate)),
+              min,
+              max,
+            });
+          })
+          .catch((ex) => console.log(ex));
+      }
   };
 
   // Function is called to update the graph data when user changes start year

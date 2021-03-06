@@ -6,10 +6,11 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
 import { Button, Card, CardContent } from "@material-ui/core";
-
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import SaveIcon from "@material-ui/icons/Save";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import { useHistory } from "react-router";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -47,12 +48,21 @@ export default function Artist() {
   const [artist, setArtist] = useState("");
   const [errors, setErrors] = useState("");
   const [open, setOpen] = useState(false);
+  const [failOpen, setFailOpen] = useState(false);
+  const history = useHistory();
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
     setOpen(false);
+  };
+
+  const handleFailClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setFailOpen(false);
   };
 
   const handleArtistChange = ({ currentTarget }) => {
@@ -66,10 +76,28 @@ export default function Artist() {
     if (artist.length === 0) {
       setErrors("Please enter artist name");
     } else {
-      setArtist("");
-      setOpen(true);
+      fetch("/artist", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ artist }),
+      })
+        .then((response) => {
+          if (response.ok) return response.json();
+          else {
+            setFailOpen(true);
+            setArtist("");
+            throw new Error("Artist already exists");
+          }
+        })
+        .then((data) => {
+          setArtist("");
+          setOpen(true);
+        })
+        .catch((ex) => console.log(ex));
     }
-    // Login
   };
 
   const successAlert = (
@@ -80,17 +108,37 @@ export default function Artist() {
       anchorOrigin={{ vertical: "top", horizontal: "center" }}
     >
       <Alert onClose={handleClose} severity="success">
-        Succesfully addedd artist! Loading tracks momentarily...
+        Succesfully added artist! Loading tracks momentarily...
+      </Alert>
+    </Snackbar>
+  );
+
+  const failAlert = (
+    <Snackbar
+      open={failOpen}
+      autoHideDuration={6000}
+      onClose={handleFailClose}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
+    >
+      <Alert onClose={handleFailClose} severity="error">
+        Artist already exists!
       </Alert>
     </Snackbar>
   );
 
   const classes = useStyles();
   return (
-    <div>
+    <div
+      style={{
+        width: "45%",
+        minWidth: "400px",
+        marginTop: "2%",
+        marginLeft: "auto",
+        marginRight: "auto",
+      }}
+    >
       <Card>
         <CardContent>
-          {" "}
           <Container maxWidth="xs">
             <SpotifyTypography align="center" variant="h3" color="primary">
               Spotify Stats
@@ -106,7 +154,7 @@ export default function Artist() {
             </Typography>
             <Grid container className={classes.formControl}>
               <form>
-                <Grid container alignItems="flex-start" spacing={2}>
+                <Grid container>
                   <Grid item xs={6}>
                     <TextField
                       variant="outlined"
@@ -131,10 +179,21 @@ export default function Artist() {
                       startIcon={<SaveIcon />}
                       size="large"
                       disabled={artist.length === 0}
-                      style={{ marginTop: "3%" }}
+                      style={{ marginTop: "3%", marginLeft: "12%" }}
                       onClick={handleSubmit}
                     >
                       Submit
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      className={classes.button}
+                      startIcon={<ArrowBackIcon />}
+                      size="large"
+                      style={{ marginTop: "3%", marginLeft: "12%" }}
+                      onClick={() => history.push("/")}
+                    >
+                      Go Back
                     </Button>
                   </Grid>
                 </Grid>
@@ -144,6 +203,7 @@ export default function Artist() {
         </CardContent>
       </Card>
       {successAlert}
+      {failAlert}
     </div>
   );
 }

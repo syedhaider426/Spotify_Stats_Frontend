@@ -10,7 +10,7 @@ import TextField from "@material-ui/core/TextField";
 import Select from "@material-ui/core/Select";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
-import { FormHelperText } from "@material-ui/core";
+import FormHelperText from "@material-ui/core/FormHelperText";
 import { Link } from "react-router-dom";
 // Styling for the form control
 const useStyles = makeStyles((theme) => ({
