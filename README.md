@@ -1,70 +1,27 @@
-# Getting Started with Create React App
+# Spotify Stats Frontend
+Spotify Stats Frontend was developed in ReactJS. It was designed with MaterialUI and uses Vega library for the charts (https://github.com/vega/react-vega). This website allows users to view the audio features for an artist throughout their entire discography range (from the time of their first song released to most recent song released). In addition, if a user cannot find a specific artist, they can submit a request to get that artist's discography and their audio features. After the songs are found, the user can view that artist on the homepage. 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Features
+1) Users can search for specific artists. 
+2) Users can view the audio features for an artist's discography. 
+3) Users can click on each data point that will redirect them to the song on Spotify.
+4) Users can add new artists which are on Spotify.
 
-## Available Scripts
+# Demo
+![Spotify Stats Home Page](https://user-images.githubusercontent.com/14322966/110608717-57279000-8141-11eb-9898-d31b6715a5b2.PNG)
+![Spotify Stats Add Artist Page](https://user-images.githubusercontent.com/14322966/110608718-5858bd00-8141-11eb-8e3a-e72ec11cce11.PNG)
 
-In the project directory, you can run:
+# Running Locally
+1) Clone the repository
+2) Install dependencies
+```
+$ npm install
+```
+3) Run the project
+```
+$ npm run start
+```
+4) Visit the demo at localhost:3000
 
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+# Authors
+Syed Haider
